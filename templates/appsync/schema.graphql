@@ -1,0 +1,55 @@
+schema {
+    query: Query
+    mutation: Mutation
+    subscription: Subscription
+}
+
+# Docs
+type Doc {
+    created: Int!
+    creatorAccountId: String!
+    id: ID!
+    body: String!
+}
+
+type DocConnection {
+    items: [Doc]
+    nextToken: String
+}
+
+input CreateDocInput {
+    creatorAccountId: String!
+    body: String!
+}
+
+input UpdateDocInput {
+    id: ID!
+    body: String
+}
+
+input DeleteDocInput {
+    id: ID!
+}
+
+type Query {
+    getLatestDocs(
+        creatorAccountId: String,
+        limit: Int,
+        nextToken: String
+    ): DocConnection
+}
+
+type Mutation {
+    createDoc(input: CreateDocInput!): Doc
+    updateDoc(input: UpdateDocInput!): Doc
+    deleteDoc(input: DeleteDocInput!): Doc
+}
+
+type Subscription {
+    onCreateDoc(creatorAccountId: String!): Doc
+    @aws_subscribe(mutations: ["createDoc"])
+    onUpdateDoc(id: ID, body: String): Doc
+    @aws_subscribe(mutations: ["updateDoc"])
+    onDeleteDoc(id: ID, body: String): Doc
+    @aws_subscribe(mutations: ["deleteDoc"])
+}
